@@ -1,6 +1,6 @@
 # MR_Cancers-PD
-In the current study, we applied two-sample MR framework to examine whether certain types of cancers have causal relationship with PD.
-In this project we used GWAS significant SNPs that are associated with a certain cancer as instrumental variables (IVs) in a second GWAS of Parkinson's disease (PD) .   
+In the current study, we applied two-sample MR framework to examine whether certain types of cancers have causal relationship with Parkinson's disease (PD).
+In this project we used GWAS significant SNPs that are associated with a certain cancer as instrumental variables (IVs) in a second GWAS of PD.   
 
 1. For the construction of our IVs, we selected studies from the GWAS Catalog using the R package “MRInstruments” which is a part of TwoSampleMR R package.
 2. Overall, 16 cancer studies summary statistics were selected for analysis as exposures. 
