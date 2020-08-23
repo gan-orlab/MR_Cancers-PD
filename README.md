@@ -16,5 +16,6 @@ In this project, we used GWAS significant SNPs that are associated with a certai
 12. Additionally, we performed reverse MR using PD as exposure and Melanoma full summary statistics as outcome.
 13. Furthermore, we performed Linlinkage Disequilibrium Score Regression (LDSR) with the four studies (breast cancer, pancreatic cancer, endometrial cancer and melanoma) we have avlaible full summary statistics from. Which was repeated including and excluding UK biobank cohort from PD summary statistics.
 
-The MR_Cancer_PD.R is a script containing all the code we utilized in our study. 
+The MR_Cancer_PD.R is a script containing all the code we utilized in our study for MR. 
+The LDSR_Cancers_PD.py is a script containing all the code we utilized in our study for LDSR. 
 All scripts related to MR are intended for Rstudio. Script related to LDSR is intended for python. Table formating was performed either in R or in Linux.
