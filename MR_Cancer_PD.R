@@ -26,10 +26,6 @@ Cutaneous_Squamous_cell_carcinoma_dat <- format_data(Cutaneous_Squamous_cell_car
 	#SE calculations here and below if absent from GWAS catalog data
 Cutaneous_Squamous_cell_carcinoma_dat$se.exposure<- TwoSampleMR:::get_se(Cutaneous_Squamous_cell_carcinoma_dat$beta.exposure,Cutaneous_Squamous_cell_carcinoma_dat$pval.exposure)
 write.csv(Cutaneous_Squamous_cell_carcinoma_dat,file="Cutaneous_Squamous_cell_carcinoma.csv",quote = FALSE)
-	#Non-melanoma skin cancer
-Nonmelanoma_skincancer <- subset(gwas_catalog, grepl("Visconti", Author) & pval <= 5e-08 & Phenotype == "Non-melanoma skin cancer")
-Nonmelanoma_skincancer_dat <- format_data(Nonmelanoma_skincancer)
-write.csv(Nonmelanoma_skincancer_dat,file="Nonmelanoma_skincancer_dat.csv",quote = FALSE)
 	#melanoma - #, abcent from the catalog, IVs created manually from the paper
 #Blood cancers
 	#Lymphoma (Genome-wide association study of classical Hodgkin lymphoma identifies key regulators of disease susceptibility)
@@ -79,76 +75,75 @@ Cervical_cancer_dat <- format_data(Cervical_cancer)
 Cervical_cancer_dat$se.exposure<- TwoSampleMR:::get_se(Cervical_cancer_dat$beta.exposur,Cervical_cancer_dat$pval.exposure)
 write.csv(Cervical_cancer_dat,file="Cervical_cancer.csv",quote = FALSE)`
 
-## R2 and F-statistics was calculated for each study
-R2- proportion of variance in exposure variable explained by SNPs 
-F-statistics ‘strength’ of the genetic instrumental variable
-
-    rFromN <-get_r_from_lor(exp_data$beta.exposure, exp_data$eaf.exposure, exp_data$ncase.exposure, xp_data$ncontrol.exposure ,0.01,  model = "logit")
-    mean(rFromN)
-    R2 <- mean(rFromN)
-    R2
-    #F-statistics
-	#k = number of variants in the study
-	#n = sample size
-	F<-(R2*(n-1-k))/((1-R2)*k)
-	F
 
 ## Mendelian randomization between all cancers as exposure and PD as outcome (PD summary statistics without the UK biobank cohort)
-
-We created for loops, to run all MR analyses simultaneously. For that, we created folders for each study.
-After we enterted R and activated TwoSampleMR and ggplot2. All 
-
     #creating folders for each study
-    for chr in Breast_cancer Colorectal_cancer Cutaneous_Squamous_cell_carcinoma endometrial_cancer glioma keratinocytes lungcancer lymphoma_bcell lymphoma melanoma Nonmelanoma_skincancer pancreaticcancer prostate_cancer renal_carcinoma Upper_digestive Urinary_bladder_cancer; do mkdir ${chr} ; done
+for chr in Breast_cancer Colorectal_cancer Cutaneous_Squamous_cell_carcinoma endometrial_cancer glioma keratinocytes lungcancer lymphoma_bcell lymphoma melanoma Nonmelanoma_skincancer pancreaticcancer prostate_cancer renal_carcinoma Upper_digestive Urinary_bladder_cancer; do mkdir ${chr} ; done
     #Open R, install packages if nessesary.
-    install.package("TwoSampleMR")
-    require(TwoSampleMR)
-    install.package("ggplot2")
-    require(ggplot2)
+install.package("TwoSampleMR")
+require(TwoSampleMR)
+install.package("ggplot2")
+require(ggplot2)	
+install.package("dplyr")
+library(dplyr)
+install.package("MRPRESSO")
+library(MRPRESSO)
     #add all exposures in the loop
     #this, allow us to run all MR analyses simultaniously, saving to the appropriate folders
-    file <- c ("Breast_cancer_clumped.csv","Colorectal_cancer_clumped.csv","Cutaneous_Squamous_cell_carcinoma_clumped.csv", "endometrial_cancer_clumped.csv", "glioma_clumped.csv", "keratinocytes_clumped.csv", "lungcancer_clumped.csv", "lymphoma_bcell_clumped.csv", "lymphoma_clumped.csv", "melanoma_clumped.csv","Nonmelanoma_skincancer_clumped.csv","pancreaticcancer_afterclumped.csv","prostate_cancer_clumped.csv","renal_cancer_clumped.csv", "Upper_digestive_clumped.csv","Urinary_bladder_cancer_clumped.csv")
-    folder <- c("Breast_cancer", "Colorectal_cancer", "Cutaneous_Squamous_cell_carcinoma", "endometrial_cancer", "glioma", "keratinocytes", "lungcancer" , "lymphoma_bcell", "lymphoma", "melanoma", "Nonmelanoma_skincancer", "pancreaticcancer", "prostate_cancer", "renal_carcinoma", "Upper_digestive", "Urinary_bladder_cancer")
-    for(i in 1:length(file)){
+file <- c ("Breast_cancer_clumped.csv","Colorectal_cancer_clumped.csv","Cutaneous_Squamous_cell_carcinoma_clumped.csv", "endometrial_cancer_clumped.csv", "glioma_clumped.csv", "keratinocytes_clumped.csv", "lungcancer_clumped.csv", "lymphoma_bcell_clumped.csv", "lymphoma_clumped.csv", "melanoma_clumped.csv","pancreaticcancer_afterclumped.csv","prostate_cancer_clumped.csv","renal_cancer_clumped.csv", "Upper_digestive_clumped.csv","Urinary_bladder_cancer_clumped.csv")
+folder <- c("Breast_cancer", "Colorectal_cancer", "Cutaneous_Squamous_cell_carcinoma", "endometrial_cancer", "glioma", "keratinocytes", "lungcancer" , "lymphoma_bcell", "lymphoma", "melanoma", "pancreaticcancer", "prostate_cancer", "renal_carcinoma", "Upper_digestive", "Urinary_bladder_cancer")    
+for(i in 1:length(file)){
     #here we simultaniously read exposure data and perform clumping with standart parameters (Clumping window 10,000 kb, R2 cutoff 0.001) 
-    exp_data <- read_exposure_data(file[i], sep=",", snp_col = "SNP", beta_col = "beta.exposure",  eaf_col = "eaf.exposure", se_col="se.exposure", effect_allele_col = "effect_allele.exposure", other_allele_col= "other_allele.exposure", pval_col = "pval.exposure", samplesize_col = "N.exposure", clump=FALSE)
-    out_data <- read_outcome_data(snps = exp_data$SNP,filename = "kostiya_snp_all.txt", sep="\t",  snp_col = "SNP", beta_col = "Effect", se_col = "StdErr", eaf_col = "Freq1", effect_allele_col = "Allele1", other_allele_col = "Allele2", pval_col = "P-value", ncase_col = "ncase", ncontrol_col = "ncontrol")
-    dat <- harmonise_data(exposure_dat=exp_data, outcome_dat=out_data, action=2)
-    #Using the output from the  `mr`  function this report will generate a report containing tables and graphs summarising the results. A separate report is produced for each exposure - outcome pair that was analysed.
-    mr_report(dat, study = folder[i],output_path = folder[i]) 
-    #to save forest plot in high resolution, using ggplot.
-    res_single <- mr_singlesnp(dat)
-    p5 <- mr_forest_plot(res_single)
-    p5[[1]]
-    ggsave(p5[[1]], file= "plot.jpg", path=folder[i] , width=7, height=12)
-    }
-  
-## Mendelian randomization between all cancers as exposure and PD as outcome (PD summary statistics without the UK biobank cohort)
+exp_data <- read_exposure_data(file[i], sep=",", snp_col = "SNP", beta_col = "beta.exposure",  eaf_col = "eaf.exposure", se_col="se.exposure", effect_allele_col = "effect_allele.exposure", other_allele_col= "other_allele.exposure", pval_col = "pval.exposure", samplesize_col = "samplesize.exposure", ncase_col= "ncase.exposure", ncontrol_col="ncontrol.exposure",  clump=FALSE)
+out_data <- read_outcome_data(snps = exp_data$SNP,filename = "PD_GWAS_noUKBB.txt", sep=",",  snp_col = "SNP", beta_col = "Effect", se_col = "StdErr", eaf_col = "Freq1", effect_allele_col = "Allele1", other_allele_col = "Allele2", pval_col = "P-value", ncase_col = "ncase", ncontrol_col = "ncontrol",samplesize_col="samplesize.outcome")
+out_data$r.outcome<- get_r_from_lor(out_data$beta.outcome, out_data$eaf.outcome, out_data$ncase.outcome, out_data$ncontrol.outcome, 0.01,  model = "logit")
+dat <- harmonise_data(exposure_dat=exp_data, outcome_dat=out_data, action=2)
+#To calculate r2 and perform steiger filtering we have added nessesary columns. Prevalence should also be specified in each exposure and outcome file or manually added
+dat$units.outcome<-"log odds"
+dat$units.exposure<-"log odds"
+#If EAF abscent we  will not be able to calcuclate r2
+dat1<-subset(dat, dat$eaf.exposure!="NA")
+dat1$r.exposure<- get_r_from_lor(dat1$beta.exposure, dat1$eaf.exposure, dat1$ncase.exposure, dat1$ncontrol.exposure, model = "logit")
+#Steiger filtering was performed to exclude SNPs that explain more variance in the outcome than in the exposure
+steiger <- steiger_filtering(dat1)
+sig<-subset(steiger, steiger$steiger_dir==TRUE)
+presso <-mr_presso(BetaOutcome = "beta.outcome", BetaExposure = "beta.exposure", SdOutcome = "se.outcome", SdExposure = "se.exposure", OUTLIERtest = TRUE, DISTORTIONtest = TRUE, data = sig, NbDistribution = 1000,  SignifThreshold = 0.05) 
+capture.output(print(presso), file = paste(folder[i], "presso.txt", sep = "/"))
+mr(sig)
+#F-statitistics and R2 were calcilated for each exposure
+R2<-mean(sig$r.exposure)
+capture.output(print(R2), file = paste(folder[i], "r2.txt", sep = "/"))
+F<-(R2*(n-1-k))/((1-R2)*k)
+capture.output(print(F), file = paste(folder[i], "f.txt", sep = "/"))
+#Output from the  `mr_report`  function will generate a report containing tables and graphs summarising the results. A separate report is produced for each exposure - outcome pair that was analysed.
+mr_report(sig, study = folder[i],output_path = folder[i]) 
+res_single <- mr_singlesnp(sig)
+p5 <- mr_forest_plot(res_single)
+p5[[1]]
+ggsave(p5[[1]], file= "plot.jpg", path=folder[i] , width=7, height=12)
+}
 
-#here we repeated all analyses using PD summary statistics with the UK biobank cohort
 
-    require(TwoSampleMR)
-    require(ggplot2)
-    file <- c ("Breast_cancer_clumped.csv","Colorectal_cancer_clumped.csv","Cutaneous_Squamous_cell_carcinoma_clumped.csv", "endometrial_cancer_clumped.csv", "glioma_clumped.csv", "keratinocytes_clumped.csv", "lungcancer_clumped.csv", "lymphoma_bcell_clumped.csv", "lymphoma_clumped.csv", "melanoma_clumped.csv","Nonmelanoma_skincancer_clumped.csv","pancreaticcancer_afterclumped.csv","prostate_cancer_clumped.csv","renal_cancer_clumped.csv", "Upper_digestive_clumped.csv","Urinary_bladder_cancer_clumped.csv")
-    folder <- c("Breast_cancer", "Colorectal_cancer", "Cutaneous_Squamous_cell_carcinoma", "endometrial_cancer", "glioma", "keratinocytes", "lungcancer" , "lymphoma_bcell", "lymphoma", "melanoma", "Nonmelanoma_skincancer", "pancreaticcancer", "prostate_cancer", "renal_carcinoma", "Upper_digestive", "Urinary_bladder_cancer")
-    for(i in 1:length(file)){
-    exp_data <- read_exposure_data(file[i], sep=",", snp_col = "SNP", beta_col = "beta.exposure",  eaf_col = "eaf.exposure", se_col="se.exposure", effect_allele_col = "effect_allele.exposure", other_allele_col= "other_allele.exposure", pval_col = "pval.exposure", samplesize_col = "N.exposure", clump=TRUE)
-    out_data <- read_outcome_data(snps = exp_data$SNP,filename = "META_no23_yesUKBB.txt", sep="\t",  snp_col = "SNP", beta_col = "b", se_col = "se", eaf_col = "freq", effect_allele_col = "A1", other_allele_col = "A2", pval_col = "p", ncase_col = "N_cases", ncontrol_col = "N_controls")
-    dat <- harmonise_data(exposure_dat=exp_data, outcome_dat=out_data, action=2)
-    mr_report(dat, study = folder[i],output_path = folder[i]) 
-    res_single <- mr_singlesnp(dat)
-    p5 <- mr_forest_plot(res_single)
-    p5[[1]]
-    ggsave(p5[[1]], file= "plot.jpg", path=folder[i] , width=7, height=12)
-    }
-    
-## Reverse MR; PD as exposure, melanoma as outcome
+## Reverse MR; PD as exposure, cancers as outcome
 
-    exp_data <- read_exposure_data(PD_exposure.csv, sep=",", snp_col = "SNP", beta_col = "beta.exposure",  eaf_col = "eaf.exposure", se_col="se.exposure", effect_allele_col = "effect_allele.exposure", other_allele_col= "other_allele.exposure", pval_col = "pval.exposure", samplesize_col = "N.exposure", clump=TRUE)
-    out_data <- read_outcome_data(snps = exp_data$SNP,filename = "melanoma.final.meta.gwas.txt", sep="\t",  snp_col = "rsID", beta_col = "Estimate_effect",  eaf_col = "EAF", se_col="SE", effect_allele_col = "Allele1", other_allele_col= "Allele2", pval_col = "P_value", ncase_col = "Case_size", ncontrol_col = "Control_size")
-    dat <- harmonise_data(exposure_dat=exp_data, outcome_dat=out_data, action=2)
-    mr_report(dat, study = folder[i],output_path = folder[i]) 
-    res_single <- mr_singlesnp(dat)
-    p5 <- mr_forest_plot(res_single)
-    p5[[1]]
-    ggsave(p5[[1]], file= "melanoma.jpg", width=7, height=12)
+exp_data <- read_exposure_data(PD_exposure.csv, sep=",", snp_col = "SNP", beta_col = "beta.exposure",  eaf_col = "eaf.exposure", se_col="se.exposure", effect_allele_col = "effect_allele.exposure", other_allele_col= "other_allele.exposure", pval_col = "pval.exposure", samplesize_col = "N.exposure", clump=TRUE)
+out_data <- read_outcome_data(snps = exp_data$SNP,filename = "melanoma.final.meta.gwas.txt", sep="\t",  snp_col = "rsID", beta_col = "Estimate_effect",  eaf_col = "EAF", se_col="SE", effect_allele_col = "Allele1", other_allele_col= "Allele2", pval_col = "P_value", ncase_col = "Case_size", ncontrol_col = "Control_size")
+#out_data <- read_outcome_data(snps = exp_data$SNP,filename = "Breast_cancer.csv", sep=",",  snp_col = "SNP", beta_col = "beta",  eaf_col = "effect_allele_frequency", se_col="standard_error", effect_allele_col = "effect_allele", other_allele_col= "other_allele", pval_col = "p_value", ncase_col = "ncase", ncontrol_col = "ncontrol")
+#out_data <- read_outcome_data(snps = exp_data$SNP,filename = "prostate_cancer_summarystats.csv", sep=",",  snp_col = "SNP", beta_col = "beta",  eaf_col = "effect_allele_frequency", se_col="standard_error", effect_allele_col = "effect_allele", other_allele_col= "other_allele", pval_col = "p_value", ncase_col = "ncase.exposure", ncontrol_col = "ncontrol.exposure")
+#out_data <- read_outcome_data(snps = exp_data$SNP,filename = "endometrial_cancer_summarystats.csv", sep=",",  snp_col = "SNP", beta_col = "beta",  eaf_col = "MEAN_EAF", se_col="se", effect_allele_col = "A1", other_allele_col= "A2", pval_col = "Pval", ncase_col = "ncase.exposure", ncontrol_col = "ncontrol.exposure")
+    out_data$r.outcome<- get_r_from_lor(out_data$beta.outcome, out_data$eaf.outcome, out_data$ncase.outcome, out_data$ncontrol.outcome, 0.01,  model = "logit")
+dat <- harmonise_data(exposure_dat=exp_data, outcome_dat=out_data, action=2)
+dat$units.outcome<-"log odds"
+dat$units.exposure<-"log odds"
+dat1<-subset(dat, dat$eaf.exposure!="NA")
+dat1$r.exposure<- get_r_from_lor(dat1$beta.exposure, dat1$eaf.exposure, dat1$ncase.exposure, dat1$ncontrol.exposure, 0.01,  model = "logit")
+steiger <- steiger_filtering(dat1)
+sig<-subset(steiger, steiger$steiger_dir==TRUE)
+presso <-mr_presso(BetaOutcome = "beta.outcome", BetaExposure = "beta.exposure", SdOutcome = "se.outcome", SdExposure = "se.exposure", OUTLIERtest = TRUE, DISTORTIONtest = TRUE, data = sig, NbDistribution = 1000,  SignifThreshold = 0.05) 
+capture.output(print(presso), file = "presso.txt")
+mr(sig)
+mr_report(sig) 
+res_single <- mr_singlesnp(dat)
+p5 <- mr_forest_plot(res_single)
+p5[[1]]
+ggsave(p5[[1]], file= "GRAPH.jpg", width=7, height=12)
