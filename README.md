@@ -24,5 +24,5 @@ In this project, we used GWAS significant SNPs that are associated with a certai
 
 The MR_Cancer_PD.R is a script containing all the code we utilized in our study for MR. 
 
-All scripts related to MR are intended for Rstudio. Script related to LDSR is intended for python. 
+All scripts related to MR are intended for Rstudio. Script related to LDSC is intended for python. 
 Table formating was performed either in R or in Linux.
