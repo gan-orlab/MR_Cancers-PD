@@ -1,9 +1,15 @@
+# LDSC_Cancers-PD
+To investigate whether there is overlapping genetic etiology between PD and the studied cancers we performed Linkage disequilibrium (LD) score regression (LDSC) 
+We performed genetic correlation between PD and melanoma, breast, prostate, endometrial and keratinocytes cancers (basal cell carcinoma and squamous cell carcinoma).
+The LDSR_Cancers_PD.py is a script containing all the code we utilized in our study for LDSR. 
+
+
 # MR_Cancers-PD
 In the current study, we applied two-sample MR framework to examine whether certain types of cancers have causal relationship with Parkinson's disease (PD).
 In this project, we used GWAS significant SNPs that are associated with a certain cancer as instrumental variables (IVs) in a second GWAS of PD.   
 
 1. For the construction of our IVs, we selected studies from the GWAS Catalog using the R package “MRInstruments” which is a part of TwoSampleMR R package.
-2. Overall, 16 cancer studies summary statistics were selected for analysis as exposures. 
+2. Overall, 15 cancer studies summary statistics were selected for analysis as exposures. 
 3. We calculated F-statistics and R2 for each of the studies in exposure.
 4. For the outcome, we used PD GWAS full summary statisctics with and without UK Biobank cohort.
 5. We performed for loops, simultaneously with all exposured and one outcome.
@@ -17,5 +23,6 @@ In this project, we used GWAS significant SNPs that are associated with a certai
 13. Furthermore, we performed Linlinkage Disequilibrium Score Regression (LDSR) with the four studies (breast cancer, pancreatic cancer, endometrial cancer and melanoma) we have avlaible full summary statistics from. Which was repeated including and excluding UK biobank cohort from PD summary statistics.
 
 The MR_Cancer_PD.R is a script containing all the code we utilized in our study for MR. 
-The LDSR_Cancers_PD.py is a script containing all the code we utilized in our study for LDSR. 
-All scripts related to MR are intended for Rstudio. Script related to LDSR is intended for python. Table formating was performed either in R or in Linux.
+
+All scripts related to MR are intended for Rstudio. Script related to LDSR is intended for python. 
+Table formating was performed either in R or in Linux.
