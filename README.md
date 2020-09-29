@@ -4,6 +4,7 @@ We performed genetic correlation between PD and melanoma, breast, prostate, endo
 The LDSR_Cancers_PD.py is a script containing all the code we utilized in our study for LDSR. 
 
 
+
 # MR_Cancers-PD
 In the current study, we applied two-sample MR framework to examine whether certain types of cancers have causal relationship with Parkinson's disease (PD).
 In this project, we used GWAS significant SNPs that are associated with a certain cancer as instrumental variables (IVs) in a second GWAS of PD.   
@@ -15,12 +16,12 @@ In this project, we used GWAS significant SNPs that are associated with a certai
 5. We performed for loops, simultaneously with all exposured and one outcome.
 6. In each loop, we performed clumping for exposures, harmonization of datasets.
 7. Using the output from the 'mr' function, we generated a report containing tables and graphs summarising the results. A separate report is produced for each exposure - outcome pair that was analysed.
-8. Report included an inverse-variance weighted (IVW) method, MR-Egger method, and Weighted median (WM).
-9. Heterogeneity was tested using Cochran’s Q test in the IVW and MR-Egger methods.
-10. For each method, we constructed funnel plots to be able to manually inspect results and notice pleiotropic outliers.
-11. We repeated all analyses with PD summary statistics including and excluding UK Biobank cohort to avoid overlap in the samples.
-12. Additionally, we performed reverse MR using PD as exposure and Melanoma full summary statistics as outcome.
-13. Furthermore, we performed Linlinkage Disequilibrium Score Regression (LDSR) with the four studies (breast cancer, pancreatic cancer, endometrial cancer and melanoma) we have avlaible full summary statistics from. Which was repeated including and excluding UK biobank cohort from PD summary statistics.
+8. Steiger filtering was performed exclude SNPs that explain more variance in the outcome than in the exposure.
+9. Report included an inverse-variance weighted (IVW) method, MR-Egger method, and Weighted median (WM).
+10. Heterogeneity was tested using Cochran’s Q test in the IVW and MR-Egger methods.
+11. We performed MR-PRESSO test to detect horizontal pleiotropy and detect possible outliers
+12. For each method, we constructed funnel plots to be able to manually inspect results and notice pleiotropic outliers.
+13. Additionally, we performed reverse MR using PD as exposure and avaliable cancers full summary statistics as outcome.
 
 The MR_Cancer_PD.R is a script containing all the code we utilized in our study for MR. 
 
